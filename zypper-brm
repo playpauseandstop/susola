@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+#
+# Search packages over zypper and remove all installed from system.
+#
+# Usage
+# =====
+#
+# # zypper se -i <package> | zypper-brm
+#
+
+import getopt
+import os
+import re
+import sys
+
+
+PACKAGE_RE = {
+    'pa': re.compile(r'^i \|[^\|]+\| (\S+)', re.M),
+    'se': re.compile(r'^i \| (\S+)', re.M),
+}
+
+
+def main():
+    script_name = os.path.basename(sys.argv[0])
+
+    try:
+        mode = sys.argv[1]
+    except IndexError:
+        mode = 'se'
+    else:
+        if not mode in PACKAGE_RE.keys():
+            print('Mode "%s" not recognized.') % mode
+            return
+
+    # Read table data from input
+    table = sys.stdin.read()
+
+    # If input is empty - print usage message
+    if not table:
+        print('Usage: zypper se -i <package> | %s') % script_name
+        return
+
+    # Find all installed packages
+    packages = PACKAGE_RE[mode].findall(table)
+
+    if not packages:
+        print('No installed packages found.')
+        return
+
+    # Build command and execute it
+    cmd = ['zypper', 'rm']
+    cmd.extend(packages)
+
+    cmd = ' '.join(cmd)
+    print(cmd)
+
+    os.system(cmd)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        print('OK OK! Exiting immediatly...')

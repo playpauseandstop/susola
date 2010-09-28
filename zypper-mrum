@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# Simple script to enable repository, refresh it, update all packages from it
+# and then disable repo.
+#
+# This script could be useful for ``repo-update`` or ``Packman`` like repos.
+#
+# Usage
+# =====
+#
+# # zypper-mrum <repo>
+#
+
+zypper mr -e $1 && \
+zypper ref $1 && \
+zypper up -r $1 && \
+zypper mr -d $1

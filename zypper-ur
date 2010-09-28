@@ -1,0 +1,161 @@
+#!/usr/bin/env python
+#
+# Simple script to update urls of all zypper repositories to use next openSUSE
+# version.
+#
+# Usage
+# =====
+#
+# # zypper-ur <version>
+#
+
+try:
+    import curses
+except ImportError:
+    curses = None
+
+import os
+import sys
+
+from ConfigParser import ConfigParser, NoOptionError, NoSectionError
+from textwrap import wrap as wrap_func
+from urllib2 import HTTPError, urlopen
+
+
+CONFIG_URL = 'baseurl'
+CONFIG_ENABLED = 'enabled'
+CONFIG_REFRESH = 'autorefresh'
+REPOS_DIR = os.environ.get('REPOS_DIR', '/etc/zypp/repos.d')
+VERSIONS = ['10.2', '10.3', '11.0', '11.1', '11.2', '11.3', '11.4']
+
+if hasattr(curses, 'initscr'):
+    SCREEN = curses.initscr()
+    SCREEN_COLS, _ = SCREEN.getmaxyx()
+else:
+    SCREEN_COLS = 80
+
+
+def error(msg, indent=False):
+    return message('ERROR: ' + msg, indent)
+
+
+def main():
+    script_name = os.path.basename(sys.argv[0])
+
+    # Check for openSUSE version
+    if len(sys.argv) != 2:
+        message('Usage: %s <version>' % script_name)
+        return
+
+    version = sys.argv[1]
+
+    if not version in VERSIONS:
+        error('Please, use valid openSUSE version number, not %r.' % version)
+        return
+
+    versions = list(set(VERSIONS) - set([version]))
+
+    # Check for repos dir
+    if not os.path.isdir(REPOS_DIR):
+        error('Repos directory %r not found.' % REPOS_DIR)
+        return
+
+    # Read list of all repositories
+    repos = map(lambda name: os.path.join(REPOS_DIR, name),
+                filter(lambda name: name.endswith('.repo'),
+                       os.listdir(REPOS_DIR)))
+    repos.sort()
+
+    message('Found %d repositories in %r.\n' % (len(repos), REPOS_DIR),
+            wrap=False)
+
+    # Read information about each repository and update it if possible
+    for repo in repos:
+        config = ConfigParser()
+
+        try:
+            config.read(repo)
+        except (IOError, OSError):
+            error('%r repo file is not readable. Please, run %r with root ' \
+                  'permissions.' % (repo, script_name), True)
+            continue
+
+        name, ext = os.path.splitext(os.path.basename(repo))
+
+        try:
+            enabled = config.getint(name, CONFIG_ENABLED)
+            old_url = config.get(name, CONFIG_URL)
+            refresh = config.getint(name, CONFIG_REFRESH)
+        except NoOptionError, e:
+            error('Cannot read %r option in %r section from %r repo file. ' \
+                  'Please, validate repo file and try again.' % \
+                  (e.option, e.section, repo), True)
+            continue
+        except NoSectionError, e:
+            error('Cannot read %r section from %r repo file. Please, ' \
+                  'check repo file.' % (e.section, repo), True)
+            continue
+
+        if version in old_url:
+            error('%r repo already updated to openSUSE %r.' % (name, version),
+                  True)
+            continue
+
+        old_version = filter(lambda v: v in old_url, versions)
+
+        if not old_version:
+            error('%r repo url %r does not contain valid openSUSE version.' % \
+                  (name, old_url), True)
+            continue
+
+        new_url = old_url.replace(old_version[0], version)
+
+        try:
+            response = urlopen(new_url)
+        except HTTPError, e:
+            error('Proposed url for %r repo is not valid. Looks like %r has ' \
+                  'not repo for %r openSUSE version. Repo will be disabled.' %\
+                  (name, name, version), True)
+
+            enabled = 0
+            new_url = old_url
+            refresh = 0
+        except IOError:
+            warning('Cannot read new url for %r repo. Please, test your ' \
+                    'internet connection.' % name, True)
+
+        config.set(name, CONFIG_ENABLED, enabled)
+        config.set(name, CONFIG_REFRESH, refresh)
+        config.set(name, CONFIG_URL, new_url)
+
+        try:
+            handler = open(repo, 'wb+')
+        except (IOError, OSError):
+            error('%r repo file is not writeable. Please, run %r with root ' \
+                  'permissions.' % (repo, script_name), True)
+        else:
+            config.write(handler)
+            message('%r repo was successfully updated to %r version.' % \
+                    (name, version), True)
+
+    message('\nAll OK!', wrap=False)
+
+
+def message(msg, indent=False, wrap=True):
+    if wrap:
+        lines = wrap_func(msg, indent and SCREEN_COLS - 4 or SCREEN_COLS)
+        msg = '\n'.join(map(lambda s: indent and '    ' + s or s, lines))
+        if len(lines) > 1:
+            msg += '\n'
+    print(msg)
+
+
+def warning(msg, indent=False):
+    return message('WARNING: ' + msg, indent)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        print('OK OK! Exiting immediatly...')

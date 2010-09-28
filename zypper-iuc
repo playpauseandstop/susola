@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+#
+# Read possible update candidates from different vendors and install its with
+# zypper.
+#
+# Usage
+# =====
+#
+# # zypper up <package> <package> | zypper-iuc
+#
+
+import re
+import os
+import sys
+
+
+PACKAGE_RE = re.compile(r"'zypper install ([^']+)'", re.M)
+
+
+def main():
+    script_name = os.path.basename(sys.argv[0])
+
+    # Read standart input
+    text = sys.stdin.read()
+
+    # If input is empty - show usage message
+    if not text:
+        print('Usage: zypper up <package> <package> | %s') % script_name
+        return
+
+    # Read available update candidates
+    packages = PACKAGE_RE.findall(text)
+
+    if not packages:
+        print('No available update candidates found.')
+        return
+
+    # Build command and execute it
+    cmd = ['zypper', 'in']
+    cmd.extend(packages)
+
+    cmd = ' '.join(cmd)
+    print(cmd)
+
+    os.system(cmd)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        print('OK OK! Exiting immediatly...')
