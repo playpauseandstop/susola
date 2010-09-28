@@ -6,7 +6,7 @@ Group:          System/Console
 License:        BSD License
 Url:            http://github.com/playpauseandstop/susola
 Requires:       zypper python
-Source:         http://github.com/playpauseandstop/%{name}/tarball/%{version}
+Source:         http://github.com/playpauseandstop/%{name}/tarball/%{versio}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -55,4 +55,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/zypper-ur
 
 %changelog
-* 2010-09-27. Initial release.
+* Tue Sep 28 2010 Igor Davydenko <playpauseandstop@gmail.com>
+  Initial release.
