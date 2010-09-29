@@ -110,6 +110,7 @@ def main():
                   (name, old_url), True)
             continue
 
+        has_error = False
         new_name = old_name.replace(old_version[0], version)
         new_url = old_url.replace(old_version[0], version)
 
