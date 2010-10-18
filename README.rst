@@ -30,6 +30,45 @@ License
 Contents
 ========
 
+sysinfo2web
+-----------
+
+Very tiny web page generated in real-time with basic sysinfo about Linux
+system.
+
+Requirements
+~~~~~~~~~~~~
+
+* Python_ 2.4 or higher
+
+Usage
+~~~~~
+
+This script is small and efficient for me replacement of sysinfo2html_,
+phpSysInfo_ or ajenti_.
+
+To enable ``sysinfo2web``, just execute::
+
+    $ sysinfo2web
+
+And point your browser to ``http://127.0.0.1:8000/`` to see results.
+
+To customize ip or port on which ``sysinfo2web`` script would be ran setup
+this values manually, like::
+
+    $ sysinfo2web <ip>:<port>
+
+or::
+
+    $ sysinfo2web :<port>
+
+After changing ip or port, point browser to new URI to see system information
+about your Linux machine.
+
+.. _sysinfo2html: http://www.mrleejohn.nl/sysinfo2html/
+.. _phpSysInfo: http://phpsysinfo.sourceforge.net/
+.. _ajenti: http://github.com/Eugeny/ajenti
+
 zypper-bin
 ----------
 
