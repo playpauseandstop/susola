@@ -39,7 +39,7 @@ system.
 Requirements
 ~~~~~~~~~~~~
 
-* Python_ 2.4 or higher
+* Python_ 2.6 or higher
 
 Usage
 ~~~~~
@@ -72,7 +72,7 @@ about your Linux machine.
 zypper-bin
 ----------
 
-**B**atch **in**stall all packages earlier found by ``zypper se -u``.
+**B**\atch **in**\stall all packages earlier found by ``zypper se -u``.
 
 Requirements
 ~~~~~~~~~~~~
@@ -91,7 +91,7 @@ command in batch mode - use ``zypper-bin`` script::
 zypper-brm
 ----------
 
-**B**atch **r**e**m**ove all packages earlier found by ``zypper se -i``.
+**B**\atch **r**\e**m**\ove all packages earlier found by ``zypper se -i``.
 
 Requirements
 ~~~~~~~~~~~~
@@ -116,7 +116,7 @@ grepping data::
 zypper-iuc
 ----------
 
-**I**nstall **u**pdate **c**andidates from different repositories.
+**I**\nstall **u**\pdate **c**\andidates from different repositories.
 
 Requirements
 ~~~~~~~~~~~~
@@ -138,8 +138,8 @@ To automate this process - use ``zypper-iuc`` script::
 zypper-mrum
 -----------
 
-Script to enable (**m**odify) repo, **r**efresh, **u**pdate all packages from
-it and disable (**m**odify) repo.
+Script to enable (**m**\odify) repo, **r**\efresh, **u**\pdate all packages from
+it and disable (**m**\odify) repo.
 
 Requirements
 ~~~~~~~~~~~~
@@ -166,10 +166,10 @@ equals to::
 zypper-ur
 ---------
 
-**U**pdate urls for all zypper **r**epositories to new openSUSE version.
+**U**\pdate urls for all zypper **r**\epositories to new openSUSE version.
 
 Requirements
-~~~~~~~~~~~
+~~~~~~~~~~~~
 
 * zypper_
 * Python_ 2.4 or higher
